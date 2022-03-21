@@ -1,10 +1,10 @@
 package lesson1;
 
-public class Pool extends Obstacle {
+public class Track extends Obstacle {
     private double length;
     private int count;
 
-    public Pool(String name, double length, int count) {
+    public Track(String name, double length, int count) {
         super(name);
         this.length = length;
         this.count = count;
@@ -12,7 +12,6 @@ public class Pool extends Obstacle {
 
     @Override
     public double getOvercomingTime(Athlete athlete) {
-        return length * count / athlete.getSwimSpeed();
+        return length * count / athlete.getRunSpeed();
     }
-
 }
