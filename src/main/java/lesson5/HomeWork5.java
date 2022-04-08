@@ -1,13 +1,12 @@
 package lesson5;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 
 public class HomeWork5 {
     public static void main(String[] args) {
-        String[] header = {"Title 1", "Title 2", "Title 3"};
-        int[][] data = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        String[] header = {"English", "Русский", "日本語"};
+        int[][] data = {{100, 200, 300}, {40, 50, 60}};
         AppData appData = new AppData(header, data);
         System.out.println(appData);
         save(appData);
@@ -16,6 +15,26 @@ public class HomeWork5 {
     }
 
     private static AppData load() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("appdata.csv"))) {
+            String[] header = reader.readLine().split(";");
+
+            ArrayList<String> lines = new ArrayList<>();
+
+            String nextLine;
+            while ((nextLine = reader.readLine()) != null) {
+                lines.add(nextLine);
+            }
+            int[][] data = new int[lines.size()][header.length];
+            for (int i = 0; i < lines.size(); i++) {
+                String[] splitLine = lines.get(i).split(";");
+                for (int j = 0; j < splitLine.length; j++) {
+                    data[i][j] = Integer.parseInt(splitLine[j]);
+                }
+            }
+            return new AppData(header, data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
