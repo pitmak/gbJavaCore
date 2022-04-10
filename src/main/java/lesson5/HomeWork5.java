@@ -2,19 +2,21 @@ package lesson5;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class HomeWork5 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String[] header = {"English", "Русский", "日本語"};
         int[][] data = {{100, 200, 300}, {40, 50, 60}};
         AppData appData = new AppData(header, data);
         System.out.println(appData);
-        save(appData);
+        //save(appData);
         AppData loadingData = load();
         System.out.println(loadingData);
+        System.out.println(Arrays.toString("234,345,456".split("4")));
     }
 
-    private static AppData load() {
+    private static AppData load()  {
         try (BufferedReader reader = new BufferedReader(new FileReader("appdata.csv"))) {
             String[] header = reader.readLine().split(";");
 
@@ -33,12 +35,13 @@ public class HomeWork5 {
             }
             return new AppData(header, data);
         } catch (IOException e) {
+            System.out.println("что-то пошло не так");
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
-    public static void save(AppData appData) {
+    public static void save(AppData appData)  throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("appdata.csv"))) {
             writer.write(appData.getHeader()[0]);
             for (int i = 1; i < appData.cols(); i++) {
@@ -54,8 +57,8 @@ public class HomeWork5 {
                     writer.newLine();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } //catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }

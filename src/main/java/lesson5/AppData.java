@@ -3,7 +3,7 @@ package lesson5;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class AppData implements Serializable {
+public class AppData {
     private String[] header;
     private int[][] data;
 
