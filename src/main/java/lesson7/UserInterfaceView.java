@@ -11,13 +11,17 @@ public class UserInterfaceView {
         System.out.println("0 - выход из программы");
 
         while (true) {
-            System.out.println("Введите имя города: ");
-            String city = scanner.nextLine();
+            String city;
+            do {
+                System.out.println("Введите название города: ");
+                city = scanner.nextLine();
+            } while (!"0".equals(city) && !controller.isValidCity(city));
+
             if ("0".equals(city)) break;
 
             String command;
             do {
-                System.out.println("Введите 1 для получения погоды на сегодня;" +
+                System.out.println("Введите 1 для получения погоды на сегодня; " +
                         "Введите 5 для прогноза на 5 дней:");
                 command = scanner.nextLine();
             } while (!"0".equals(command) && !controller.isValidCommand(command));

@@ -10,6 +10,7 @@ public class Controller {
 
     public Controller() {
         variants.put(1, Period.NOW);
+        variants.put(2, Period.DB);
         variants.put(5, Period.FIVE_DAYS);
     }
 
@@ -19,6 +20,11 @@ public class Controller {
     }
 
     public boolean isValidCommand(String c) {
-        return "1".equals(c) || "5".equals(c);
+        return variants.containsKey(Integer.parseInt(c));
+    }
+
+    public boolean isValidCity(String c) {
+        // TODO добавить проверку на корректность
+        return true;
     }
 }
