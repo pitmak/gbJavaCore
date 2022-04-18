@@ -20,11 +20,10 @@ public class Controller {
     }
 
     public boolean isValidCommand(String c) {
-        return variants.containsKey(Integer.parseInt(c));
+        return "1".equals(c) || "2".equals(c) || "5".equals(c);
     }
 
     public boolean isValidCity(String c) {
-        // TODO добавить проверку на корректность
-        return true;
+        return weatherModel.isValidCity(c);
     }
 }

@@ -2,7 +2,6 @@ package lesson7;
 
 import lesson7.entity.Weather;
 
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DataBaseRepository {
@@ -26,20 +24,19 @@ public class DataBaseRepository {
         }
     }
 
-    public boolean saveWeatherToDataBase(Weather weather) throws SQLException {
+    public void saveWeatherToDataBase(Weather weather) {
         try (Connection connection = DriverManager.getConnection(DB_PATH)) {
             PreparedStatement saveWeather = connection.prepareStatement(insertWeather);
             saveWeather.setString(1, weather.getCity());
             saveWeather.setString(2, weather.getLocalDate());
             saveWeather.setString(3, weather.getTemperature());
-            return saveWeather.execute();
+            saveWeather.execute();
         } catch (SQLException t) {
             t.printStackTrace();
         }
-        throw new SQLException("Сохранение погоды в базу данных не выполнено!");
     }
 
-    public void saveWeatherToDataBase(List<Weather> weatherList) throws SQLException {
+    public void saveWeatherToDataBase(List<Weather> weatherList) {
         try (Connection connection = DriverManager.getConnection(DB_PATH)) {
             PreparedStatement saveWeather = connection.prepareStatement(insertWeather);
             for (Weather weather : weatherList) {

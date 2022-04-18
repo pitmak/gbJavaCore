@@ -9,10 +9,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AccuweatherModel {
@@ -23,6 +21,8 @@ public class AccuweatherModel {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final DataBaseRepository dataBaseRepository = new DataBaseRepository();
+
+    private static final HashMap<String, String> citiesCache = new HashMap<>();
 
     public void getWeather(String selectedCity, Period period) throws IOException {
         switch (period) {
@@ -59,11 +59,7 @@ public class AccuweatherModel {
                 System.out.println("  днем: " + atDayForecast + ", ночью: " + atNightForecast + "\n");
 
                 Weather weatherToDB = new Weather(selectedCity, dateOfForecast, maxTemperature);
-                try {
-                    dataBaseRepository.saveWeatherToDataBase(weatherToDB);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                dataBaseRepository.saveWeatherToDataBase(weatherToDB);
             }
             case FIVE_DAYS -> {
                 HttpUrl httpUrl = new HttpUrl.Builder()
@@ -102,11 +98,7 @@ public class AccuweatherModel {
 
                     weatherToDBs.add(new Weather(selectedCity, dateOfForecast, maxTemperature));
                 }
-                try {
-                    dataBaseRepository.saveWeatherToDataBase(weatherToDBs);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                dataBaseRepository.saveWeatherToDataBase(weatherToDBs);
             }
             case DB -> {
                 dataBaseRepository.getSavedToDBWeather();
@@ -114,8 +106,12 @@ public class AccuweatherModel {
         }
     }
 
+    public boolean isValidCity(String city) {
+        if ("".equals(city)) return false;
+        if (citiesCache.containsKey(city)) {
+            return !citiesCache.get(city).equals("");
+        }
 
-    private String detectCityKey(String selectCity) throws IOException {
         HttpUrl httpUrl = new HttpUrl.Builder()
                 .scheme("https")
                 .host("dataservice.accuweather.com")
@@ -125,22 +121,34 @@ public class AccuweatherModel {
                 .addPathSegment("autocomplete")
                 .addQueryParameter("apikey", API_KEY)
                 .addQueryParameter("language", "ru-ru")
-                .addQueryParameter("q", selectCity)
+                .addQueryParameter("q", city)
                 .build();
 
         Request request = new Request.Builder()
                 .url(httpUrl)
                 .build();
 
-        String responseString;
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (response.body() != null) {
-                responseString = response.body().string();
+                String responseString = response.body().string();
                 if (!"[]".equals(responseString)) {
-                    return objectMapper.readTree(responseString).get(0).at("/Key").asText();
+                    String cityCode = objectMapper.readTree(responseString).get(0).at("/Key").asText();
+                    citiesCache.put(city, cityCode);
+                    return true;
+                } else {
+                    citiesCache.put(city, "");
+                    return false;
                 }
             }
-            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return false;
+    }
+
+
+    private String detectCityKey(String selectCity) {
+        assert citiesCache.containsKey(selectCity);
+        return citiesCache.get(selectCity);
     }
 }
